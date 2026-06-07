@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sydney Trains Quiz</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Sydney Trains Station Quiz</h1>
+      <p class="subtitle">Click a hidden label, name the station, reveal the map.</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="progress-wrap">
+        <span id="progressText">0 / 0 stations</span>
+        <div class="progress-bar" aria-hidden="true">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+      <button id="resetBtn" class="btn danger" type="button">Reset</button>
+      <button id="toggleEditBtn" class="btn secondary" type="button">Edit mode: Off</button>
+      <button id="exportBtn" class="btn secondary" type="button" hidden>Export rects</button>
+      <button id="saveServerBtn" class="btn secondary" type="button" hidden>Save to server</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="map-card">
+      <div id="mapStage" class="map-stage">
+        <div id="mapContent" class="map-content">
+          <img id="mapImage" src="./map.svg" alt="Sydney rail network map" draggable="false">
+          <div id="overlayLayer" class="overlay-layer"></div>
+          <div id="editorLayer" class="editor-layer" hidden></div>
+        </div>
+        <div class="map-controls">
+          <button id="zoomOutBtn" class="btn secondary" type="button" title="Zoom out">-</button>
+          <span id="zoomLabel" class="zoom-label">100%</span>
+          <button id="zoomInBtn" class="btn secondary" type="button" title="Zoom in">+</button>
+          <button id="zoomResetBtn" class="btn ghost" type="button" title="Reset view">Reset view</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <h2>Game</h2>
+      <p id="statusText">Pick a hidden station label to start.</p>
+      <div class="chips">
+        <button class="chip is-active" data-filter="ALL" type="button">All lines</button>
+        <button class="chip" data-filter="M1" type="button">M1</button>
+        <button class="chip" data-filter="T1" type="button">T1</button>
+        <button class="chip" data-filter="T2" type="button">T2</button>
+        <button class="chip" data-filter="T3" type="button">T3</button>
+        <button class="chip" data-filter="T4" type="button">T4</button>
+        <button class="chip" data-filter="T5" type="button">T5</button>
+        <button class="chip" data-filter="T6" type="button">T6</button>
+        <button class="chip" data-filter="T7" type="button">T7</button>
+        <button class="chip" data-filter="T8" type="button">T8</button>
+        <button class="chip" data-filter="T9" type="button">T9</button>
+      </div>
+      <h3>Recently Revealed</h3>
+      <ul id="recentList" class="recent-list"></ul>
+
+      <section id="editPanel" class="edit-panel" hidden>
+        <h3>Edit Selected Rect</h3>
+        <p id="editStationName" class="edit-station-name">No station selected</p>
+        <div class="edit-grid">
+          <label>X <input id="editX" type="number" step="1"></label>
+          <label>Y <input id="editY" type="number" step="1"></label>
+          <label>W <input id="editW" type="number" step="1" min="8"></label>
+          <label>H <input id="editH" type="number" step="1" min="8"></label>
+          <label>Angle <input id="editAngle" type="number" step="1"></label>
+        </div>
+        <div class="edit-actions">
+          <button id="applyRectBtn" class="btn secondary" type="button">Apply</button>
+          <button id="resetRectBtn" class="btn ghost" type="button">Reset selected</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <div id="answerModal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Name this station</h2>
+      <p id="lineHint" class="line-hint"></p>
+      <form id="answerForm">
+        <input id="answerInput" type="text" autocomplete="off" placeholder="Type station name">
+        <p id="feedbackText" class="feedback"></p>
+        <div class="modal-actions">
+          <button class="btn primary" type="submit">Submit</button>
+          <button id="hintBtn" class="btn secondary" type="button">Hint</button>
+          <button id="skipBtn" class="btn secondary" type="button">Give up</button>
+          <button id="closeBtn" class="btn ghost" type="button">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./stations.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
