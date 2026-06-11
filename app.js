@@ -101,6 +101,8 @@ const view = {
   scale: 1,
   minScale: 1,
   maxScale: 5,
+  baseWidth: 1,
+  baseHeight: 1,
   tx: 0,
   ty: 0,
   isPanning: false,
@@ -546,8 +548,8 @@ function stagePointToImage(event) {
   const localY = event.clientY - rect.top;
   const contentX = (localX - view.tx) / view.scale;
   const contentY = (localY - view.ty) / view.scale;
-  const x = (contentX / rect.width) * nx;
-  const y = (contentY / rect.height) * ny;
+  const x = (contentX / view.baseWidth) * nx;
+  const y = (contentY / view.baseHeight) * ny;
   return { x, y };
 }
 
@@ -556,16 +558,13 @@ function updateZoomLabel() {
 }
 
 function clampView() {
-  const rect = mapStage.getBoundingClientRect();
-  const scaledW = rect.width * view.scale;
-  const scaledH = rect.height * view.scale;
-
-  const padX = rect.width * 0.35;
-  const padY = rect.height * 0.35;
-  const minTx = Math.min(0, rect.width - scaledW) - padX;
-  const minTy = Math.min(0, rect.height - scaledH) - padY;
-  const maxTx = padX;
-  const maxTy = padY;
+  const stageRect = mapStage.getBoundingClientRect();
+  const scaledW = view.baseWidth * view.scale;
+  const scaledH = view.baseHeight * view.scale;
+  const minTx = scaledW <= stageRect.width ? (stageRect.width - scaledW) / 2 : stageRect.width - scaledW;
+  const maxTx = scaledW <= stageRect.width ? minTx : 0;
+  const minTy = scaledH <= stageRect.height ? (stageRect.height - scaledH) / 2 : stageRect.height - scaledH;
+  const maxTy = scaledH <= stageRect.height ? minTy : 0;
 
   view.tx = Math.min(maxTx, Math.max(minTx, view.tx));
   view.ty = Math.min(maxTy, Math.max(minTy, view.ty));
@@ -573,8 +572,45 @@ function clampView() {
 
 function applyView() {
   clampView();
+  mapContent.style.width = `${view.baseWidth}px`;
+  mapContent.style.height = `${view.baseHeight}px`;
   mapContent.style.transform = `translate(${view.tx}px, ${view.ty}px) scale(${view.scale})`;
   updateZoomLabel();
+}
+
+function updateBaseMapSizeAndCenter({ preserveCenter = true } = {}) {
+  const stageRect = mapStage.getBoundingClientRect();
+  const prev = {
+    baseWidth: view.baseWidth,
+    baseHeight: view.baseHeight,
+    scale: view.scale,
+    tx: view.tx,
+    ty: view.ty,
+    stageW: stageRect.width,
+    stageH: stageRect.height
+  };
+
+  const imageAspect = (mapImage.naturalHeight || 1123) / (mapImage.naturalWidth || 794);
+  view.baseWidth = stageRect.width;
+  view.baseHeight = stageRect.width * imageAspect;
+
+  if (!preserveCenter || prev.baseWidth <= 1 || prev.baseHeight <= 1) {
+    view.tx = 0;
+    view.ty = (stageRect.height - view.baseHeight * view.scale) / 2;
+    applyView();
+    return;
+  }
+
+  const oldCenterContentX = (prev.stageW / 2 - prev.tx) / prev.scale;
+  const oldCenterContentY = (prev.stageH / 2 - prev.ty) / prev.scale;
+  const relX = oldCenterContentX / prev.baseWidth;
+  const relY = oldCenterContentY / prev.baseHeight;
+  const newContentCenterX = relX * view.baseWidth;
+  const newContentCenterY = relY * view.baseHeight;
+
+  view.tx = stageRect.width / 2 - newContentCenterX * view.scale;
+  view.ty = stageRect.height / 2 - newContentCenterY * view.scale;
+  applyView();
 }
 
 function setZoom(nextScale, clientX = null, clientY = null) {
@@ -846,6 +882,7 @@ function bindUI() {
   applyRectBtn.addEventListener("click", applyEditInputs);
   resetRectBtn.addEventListener("click", resetSelectedRect);
   document.addEventListener("keydown", handleKeydown);
+  window.addEventListener("resize", () => updateBaseMapSizeAndCenter({ preserveCenter: true }));
 
   if (!state.editorEnabled) {
     toggleEditBtn.hidden = true;
@@ -889,6 +926,7 @@ async function init() {
     };
     mapStage.style.setProperty("--map-aspect-ratio", `${mapImage.naturalWidth} / ${mapImage.naturalHeight}`);
   }
+  updateBaseMapSizeAndCenter({ preserveCenter: false });
   const loadedFromJson = await loadRectsFromStationsJson();
   loadStorage({ rectOverrideMode: loadedFromJson ? "missing-only" : "all" });
   saveRects();

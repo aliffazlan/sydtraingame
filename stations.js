@@ -36,7 +36,7 @@ const STATIONS = [
   s("Berala", ["T3", "T6"]), s("Birrong", ["T6"]), s("Yagoona", ["T6"]),
   s("Bankstown", ["T6"]), s("Punchbowl", ["T6"]), s("Wiley Park", ["T6"]), s("Lakemba", ["T6"]), s("Belmore", ["T6"]),
   s("Campsie", ["T6"]), s("Canterbury", ["T6"]), s("Hurlstone Park", ["T6"]), s("Dulwich Hill", ["T6"]), s("Marrickville", ["T6"]),
-  s("Sydenham", ["T3", "T8", "T4", "M1"]), s("Bondi Junction", ["T4"]), s("Edgecliff", ["T4"]), s("Kings Cross", ["T4"]),
+  s("Sydenham", ["T8", "T4", "M1"]), s("Bondi Junction", ["T4"]), s("Edgecliff", ["T4"]), s("Kings Cross", ["T4"]),
   s("Erskineville", ["T8"]), s("St Peters", ["T8"], ["Saint Peters"]), s("Tempe", ["T4"]), s("Wolli Creek", ["T4", "T8"]),
   s("Arncliffe", ["T4"]), s("Banksia", ["T4"]), s("Rockdale", ["T4"]), s("Kogarah", ["T4"]), s("Carlton", ["T4"]),
   s("Allawah", ["T4"]), s("Hurstville", ["T4"]), s("Penshurst", ["T4"]), s("Mortdale", ["T4"]), s("Oatley", ["T4"]),
